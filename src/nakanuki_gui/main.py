@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 from datetime import datetime
 
-from app.nakanuki import nakanuki_image
+from src.nakanuki_core.nakanuki import nakanuki_image
 
 def resource_path(relative):
     if hasattr(sys, "_MEIPASS"):
@@ -13,7 +13,7 @@ def resource_path(relative):
     else:
         return Path(__file__).resolve().parent.parent / relative
 
-ICON_PATH = resource_path("img/nakanuki.ico")
+ICON_PATH = resource_path("resources/nakanuki.ico")
 
 class NakanukiApp:
     def __init__(self, root):
