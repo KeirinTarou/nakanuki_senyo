@@ -8,7 +8,7 @@ python run.py
 - pyinstallerコマンド
     - `nakanuki_senyo`ディレクトリをカレントディレクトリにして実行
 ```bash
-pyinstaller --onefile --noconsole --name nakanuki --add-data "img/nakanuki.ico;img" --icon img/nakanuki.ico run.py
+pyinstaller --onefile --noconsole --name nakanuki --add-data "src/resources/nakanuki.ico;." --icon src/resources/nakanuki.ico run.py
 ```
 
 ## プロジェクトのディレクトリ構成
