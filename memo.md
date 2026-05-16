@@ -11,6 +11,31 @@ python run.py
 pyinstaller --onefile --noconsole --name nakanuki --add-data "img/nakanuki.ico;img" --icon img/nakanuki.ico run.py
 ```
 
+## プロジェクトのディレクトリ構成
+```bash
+nakanuki_senyo/
+├── src/
+│   ├── nakanuki_core/ 
+│   │   ├── __init__.py 
+│   │   └── nakanuki.py     # 中抜き処理ロジック
+│   ├── nakanuki_gui/ 
+│   │   ├── __init__.py 
+│   │   └── main.py         # GUIエントリポイント
+│   └── resources/ 
+│       └── nakanuki.ico 
+│
+├── tests/
+│   ├── __init__.py 
+│   └── test_basic.py       # pytest
+│
+├── run.py                  # python run.py で GUI 起動補助
+├── pytest.ini
+├── requirements.txt
+├── README.md
+└── .gitignore
+
+```
+
 ## `main.py`
 ```py
 import tkinter as tk
