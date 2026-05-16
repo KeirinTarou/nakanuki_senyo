@@ -2,17 +2,10 @@ import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from pathlib import Path
-import sys
 from datetime import datetime
 
-from config import BASE_DIR, RESOURCES_DIR
+from config import (resource_path)
 from src.nakanuki_core.nakanuki import nakanuki_image
-
-def resource_path(relative):
-    if hasattr(sys, "_MEIPASS"):
-        return Path(sys._MEIPASS) / relative
-    else:
-        return RESOURCES_DIR / relative
 
 ICON_PATH = resource_path("nakanuki.ico")
 
