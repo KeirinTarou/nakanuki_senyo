@@ -1,7 +1,7 @@
 # TODO:
-#   - import構造が壊れていない
-#   - nakanukiモジュールのnakanuki_image()が呼べる
-#   - mainモジュールのNakanukiAppクラスが読める
+#   ✅- import構造が壊れていない
+#   ✅- nakanukiモジュールのnakanuki_image()が呼べる
+#   ✅- mainモジュールのNakanukiAppクラスが読める
 
 def test_import_structure():
     """ import構造が壊れていない"""
