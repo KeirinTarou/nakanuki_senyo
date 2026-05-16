@@ -170,7 +170,8 @@ class NakanukiApp:
             return
         
         img = self.original_image
-        out = nakanuki_image(img, y_from, y_to)
+        rgbed = img.convert("RGB")
+        out = nakanuki_image(rgbed, y_from, y_to)
 
         # ファイル名生成
         src = Path(img.filename)
