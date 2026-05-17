@@ -4,8 +4,9 @@ from PIL import Image, ImageTk
 from pathlib import Path
 from datetime import datetime
 
-from config import (resource_path)
+from config import (resource_path, IMG_DISPLAY_SIZE)
 from src.nakanuki_core.nakanuki import nakanuki_image
+from src.nakanuki_core.image_processor import ImageProcessor
 
 ICON_PATH = resource_path("nakanuki.ico")
 
@@ -87,27 +88,27 @@ class NakanukiApp:
         )
         if not path:
             return
-        
-        self.original_image = Image.open(path)
-        w, h = self.original_image.size
+        # 元画像のImageオブジェクト取得 -> original_imageにセット
+        # 画像の取得・加工はImageProcessorに委譲
+        proc = ImageProcessor(path)
+        self.original_image = proc.image
+        img = self.original_image
+        w, h = img.size
         # 画像高さ表示ラベルを更新
         self.var_height.set(f"Height: {h} px")
 
         # 表示用に縮小
-        scale = min(600 / w, 400 / h, 1)
-        self.display_scale = scale
-
-        display_w = int(w * scale)
-        display_h = int(h * scale)
-
-        resized = self.original_image.resize(
-            (display_w, display_h), Image.LANCZOS)
+        # リサイズ用のサイズを取得
+        max_w, max_h = IMG_DISPLAY_SIZE[0], IMG_DISPLAY_SIZE[1]
+        display_w, display_h = proc.calc_display_size(img, max_w, max_h)
+        # リサイズ後画像を取得
+        resized = proc.resize_for_display(img, display_w, display_h)
         self.display_image = ImageTk.PhotoImage(resized)
 
         # キャンバス中央に画像を表示
         self.canvas.delete("all")
-        # 300, 200はキャンバスの中心座標
-        self.canvas.create_image(300, 200, image=self.display_image)
+        center_x, center_y = max_w / 2, max_h / 2
+        self.canvas.create_image(center_x, center_y, image=self.display_image)
 
         # Spinboxの最大値調整
         self.spin_from.config(to=h)

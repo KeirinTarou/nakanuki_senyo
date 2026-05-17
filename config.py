@@ -1,6 +1,10 @@
 from pathlib import Path
 import sys
 
+# アプリの基本設定まわり
+IMG_DISPLAY_SIZE = (600, 400)
+
+# パス解決まわり
 BASE_DIR = Path(__file__).resolve().parent
 RESOURCES_DIR = BASE_DIR / "src" / "resources"
 
@@ -9,3 +13,4 @@ def resource_path(relative):
         return Path(sys._MEIPASS) / relative
     else:
         return RESOURCES_DIR / relative
+    
