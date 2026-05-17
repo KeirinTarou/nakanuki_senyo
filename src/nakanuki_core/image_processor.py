@@ -31,7 +31,7 @@ class ImageProcessor:
     
     def calc_display_size(
             self, img: Image.Image | None=None, 
-            max_w: int=600, max_h: int=400) -> Tuple[int, int]:
+            max_w: int=600, max_h: int=400) -> Tuple[int, int, float]:
         """ 表示用リサイズ後のサイズのタプルを返す
         
         :param img: Imageオブジェクト
@@ -40,8 +40,8 @@ class ImageProcessor:
         :type max_w: int
         :param max_h: リサイズ後の画像の最大高さ
         :type max_w: int
-        :return: リサイズ後の幅、高さのタプル
-        :rtype: Tuple[int, int]
+        :return: リサイズ後の幅、高さ、表示倍率のタプル
+        :rtype: Tuple[int, int, float]
         .. note::
             - src/nakanuki_core/image_processor.py
         """
@@ -52,7 +52,7 @@ class ImageProcessor:
             raise ValueError("calc_display_size: image is not loaded.")
         w, h = img.size
         scale = min(max_w / w, max_h / h, 1)
-        return int(w * scale), int(h * scale)
+        return int(w * scale), int(h * scale), scale
     
     def resize_for_display(
             self, img: Image.Image | None, 
