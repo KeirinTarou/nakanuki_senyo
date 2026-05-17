@@ -219,13 +219,13 @@ class NakanukiApp:
         # 画像がキャンバスよりも小さい場合は正の数になる
         # 画像がキャンバスよりも大きい場合は縮小されるので0未満にはならない
         h_img_top = max(y_disp_center - h_img_half, 0)
-        y_from_disp = h_img_top + (y_from * display_scale)
+        y_from_disp = int(h_img_top + (y_from * display_scale))
 
         # Toの水平線
         # キャンバス配置後の画像の下端のy座標
         # 画像の下端よりも大きくはならない
         h_img_bottom = min(y_disp_center + h_img_half, h_disp)
-        y_to_disp = min(h_img_top + (y_to * display_scale), h_img_bottom)
+        y_to_disp = int(min(h_img_top + (y_to * display_scale), h_img_bottom))
 
         line1 = (x0, y_from_disp, x1, y_from_disp)
         line2 = (x0, y_to_disp, x1, y_to_disp)
