@@ -34,9 +34,10 @@ class NakanukiApp:
         spin_frame = tk.Frame(root)
         spin_frame.pack()
 
+        self.var_height = tk.StringVar(value="Height: - px")
         self.var_from = tk.StringVar()
         self.var_to = tk.StringVar()
-        self.var_height = tk.StringVar(value="Height: - px")
+        self.var_add_break_line = tk.BooleanVar(value=False)
 
         self.lbl_height = tk.Label(
             spin_frame, 
@@ -55,6 +56,11 @@ class NakanukiApp:
             spin_frame, from_=0, to=9999, width=6, 
             textvariable=self.var_to, command=self.update_lines)
         self.spin_to.pack(side=tk.LEFT)
+
+        tk.Checkbutton(
+            spin_frame, text="省略線追加", 
+            variable=self.var_add_break_line
+        ).pack(side=tk.LEFT, padx=10)
 
         # trace 追加
         self.var_from.trace_add("write", lambda *args: self.update_lines())
@@ -167,7 +173,8 @@ class NakanukiApp:
         
         img = self.original_image
         rgbed = img.convert("RGB")
-        out = nakanuki_image(rgbed, y_from, y_to)
+        add_break_line = self.var_add_break_line.get()
+        out = nakanuki_image(rgbed, y_from, y_to, add_break_line)
 
         # ファイル名生成
         src = Path(img.filename)
