@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 
 # アプリの基本設定まわり
-IMG_DISPLAY_SIZE = (600, 400)
+CANVAS_SIZE = (600, 400)
 
 # パス解決まわり
 BASE_DIR = Path(__file__).resolve().parent
