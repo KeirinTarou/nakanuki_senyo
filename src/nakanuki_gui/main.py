@@ -4,6 +4,7 @@ from PIL import ImageTk
 from pathlib import Path
 from datetime import datetime
 from typing import Tuple
+import traceback
 
 from config import (resource_path, IMG_DISPLAY_SIZE)
 from src.nakanuki_core.nakanuki import nakanuki_image
@@ -174,15 +175,26 @@ class NakanukiApp:
         img = self.original_image
         rgbed = img.convert("RGB")
         add_break_line = self.var_add_break_line.get()
-        out = nakanuki_image(rgbed, y_from, y_to, add_break_line)
+        try:
+            out = nakanuki_image(rgbed, y_from, y_to, add_break_line)
+        except Exception as e:
+            log("ERROR in nakanuki:")
+            log(traceback.format_exc())
+            return
 
         # ファイル名生成
         src = Path(img.filename)
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         out_name = f"{src.stem}_{ts}{src.suffix}"
 
-        save_dir = Path.home() / "Downloads"
-        out.save(save_dir / out_name)
+        try:
+            save_dir = Path.home() / "Downloads"
+            save_path = save_dir / out_name
+            out.save(save_path)
+            log(f"Saved: {save_path}")
+        except Exception:
+            log("ERROR saving:")
+            log(traceback.format_exc())
     
     # Internal methods
     @staticmethod
@@ -238,6 +250,12 @@ class NakanukiApp:
         line2 = (x0, y_to_disp, x1, y_to_disp)
 
         return line1, line2
+
+LOG = Path.home() / "Downloads"
+
+def log(s):
+    with open(LOG, "a", encoding="utf-8") as f:
+        f.write(str(s) + "\n")
 
 def main():
     root = tk.Tk()

@@ -1,6 +1,6 @@
 from PIL import Image
 
-from config import RESOURCES_DIR
+from config import resource_path
 
 def nakanuki_image(
         img: Image.Image, 
@@ -40,7 +40,7 @@ def nakanuki_image(
     out.paste(bottom, (0, top.height))
 
     if add_break_line:
-        break_img = Image.open(RESOURCES_DIR / "breakline.png")
+        break_img = Image.open(resource_path("breakline.png"))
         if break_img.mode != "RGBA":
             break_img = break_img.convert("RGBA")
         break_img = break_img.resize((w, 40), Image.LANCZOS)
