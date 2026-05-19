@@ -29,6 +29,8 @@ pyinstaller ^
     - --icon
         - 実行ファイルのアイコンのパス
 
+
+
 ## プロジェクトのディレクトリ構成
 ```bash
 nakanuki_senyo/

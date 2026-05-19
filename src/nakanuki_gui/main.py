@@ -14,6 +14,7 @@ ICON_PATH = resource_path("nakanuki.ico")
 
 class NakanukiApp:
     def __init__(self, root):
+        # tkinter.Tkインスタンス
         self.root = root
         self.root.title("中抜専用")
         self.root.geometry("640x480")
@@ -21,8 +22,9 @@ class NakanukiApp:
         root.iconbitmap(ICON_PATH)
 
         # プレビュー領域
+        canv_w, canv_h = CANVAS_SIZE
         self.canvas = tk.Canvas(
-            root, bg="gray", width=600, height=400)
+            root, bg="gray", width=canv_w, height=canv_h)
         self.canvas.pack(pady=10)
 
         # 画像データ
@@ -31,34 +33,38 @@ class NakanukiApp:
         self.display_scale = 1.0
         self.canvas_image_id = None
 
-        # スピンボックス
-        spin_frame = tk.Frame(root)
-        spin_frame.pack()
-
+        # GUIから取得した値を格納する属性群
         self.var_height = tk.StringVar(value="Height: - px")
         self.var_from = tk.StringVar()
         self.var_to = tk.StringVar()
         self.var_add_break_line = tk.BooleanVar(value=False)
 
+        # ラインID保持用属性
+        self.line_ids = []
+
+        # UIパーツ群（1段目）
+        # スピンボックス用（画像サイズ用ラベル・チェックボックス含む）用フレーム
+        spin_frame = tk.Frame(root)
+        spin_frame.pack()
+        # 画像の高さを表示するラベル
         self.lbl_height = tk.Label(
             spin_frame, 
             textvariable=self.var_height
         )
         self.lbl_height.pack(side=tk.LEFT, padx=10)
-
+        # 「From」スピンボックス
         tk.Label(spin_frame, text="From").pack(side=tk.LEFT, padx=5)
         self.spin_from = tk.Spinbox(
             spin_frame, from_=0, to=9999, width=6, 
             textvariable=self.var_from, command=self.update_lines)
         self.spin_from.pack(side=tk.LEFT)
-
+        # 「To」スピンボックス
         tk.Label(spin_frame, text="To").pack(side=tk.LEFT, padx=5)
         self.spin_to = tk.Spinbox(
             spin_frame, from_=0, to=9999, width=6, 
             textvariable=self.var_to, command=self.update_lines)
         self.spin_to.pack(side=tk.LEFT)
-
-        # チェックボックス
+        # 「省略線追加」チェックボックス
         tk.Checkbutton(
             spin_frame, text="省略線追加", 
             variable=self.var_add_break_line
@@ -68,28 +74,29 @@ class NakanukiApp:
         self.var_from.trace_add("write", lambda *args: self.update_lines())
         self.var_to.trace_add("write", lambda *args: self.update_lines())
 
-        # ボタン群
+        # UIパーツ群（2段目）
+        # ボタンを収めるフレーム
         btn_frame = tk.Frame(root)
         btn_frame.pack()
 
+        # 「画像を開く」ボタン
         tk.Button(
             btn_frame, 
             text="画像を開く", 
             command=self.load_image
         ).pack(side=tk.LEFT, padx=5)
+        # 「中抜き！」ボタン
         tk.Button(
             btn_frame, 
             text="中抜き！", 
             command=self.nakanuki_and_save
         ).pack(side=tk.LEFT, padx=5)
+        # 「終了」ボタン
         tk.Button(
             btn_frame, 
             text="終了", 
             command=root.quit
         ).pack(side=tk.LEFT, padx=5)
-
-        # ラインID保持
-        self.line_ids = []
 
     def load_image(self):
         path = filedialog.askopenfilename(
