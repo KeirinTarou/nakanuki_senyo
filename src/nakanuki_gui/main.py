@@ -255,7 +255,7 @@ class NakanukiApp:
 LOG = Path.home() / "Downloads"
 
 def log(s):
-    with open(LOG, "a", encoding="utf-8") as f:
+    with open(LOG / "nakanuki.log", "a", encoding="utf-8") as f:
         f.write(str(s) + "\n")
 
 def main():
