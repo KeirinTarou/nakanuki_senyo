@@ -1,4 +1,10 @@
 ## メモ
+- Python3.12を使用
+    - pillowとの相性の問題？
+```bash
+py --3.12 -m venv .venv
+```
+
 - コマンドラインで実行
     - `nakanuki_senyo`ディレクトリをカレントディレクトリにして実行
 ```bash
