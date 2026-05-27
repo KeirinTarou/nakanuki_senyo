@@ -104,6 +104,9 @@ class NakanukiApp:
         )
         if not path:
             return
+        
+        self.src_path = Path(path)
+
         # 元画像のImageオブジェクト取得 -> original_imageにセット
         # 画像の取得・加工はImageProcessorに委譲
         proc = ImageProcessor(path)
@@ -196,7 +199,7 @@ class NakanukiApp:
         out_name = f"{src.stem}_{ts}{src.suffix}"
 
         try:
-            save_dir = Path.home() / "Downloads"
+            save_dir = self.src_path.parent
             save_path = save_dir / out_name
             out.save(save_path)
             log(f"Saved: {save_path}")
