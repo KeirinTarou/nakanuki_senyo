@@ -35,8 +35,6 @@ pyinstaller ^
     - --icon
         - 実行ファイルのアイコンのパス
 
-
-
 ## プロジェクトのディレクトリ構成
 ```bash
 nakanuki_senyo/
@@ -70,6 +68,107 @@ nakanuki_senyo/
 └── .gitignore
 
 ```
+
+## fixtureについて
+- `tests`ディレクトリ直下の`conftest.py`に書いたフィクスチャは、テストファイルでインポートしなくても呼び出すことができる
+- `@pytest.fixture`デコレータを付けた関数を定義し、テストファイル側から呼び出して利用する
+    - テスト関数の引数リストに追加するだけでOK
+    - 例: `test_some_test_function(some_fixture):`
+        - これだけで、関数ブロック内で`fixture`がフィクスチャで定義した機能を持ってふるまう
+
+### 事例集
+#### tkinter.Tkインスタンスを代用する
+```py
+@pytest.fixture
+def tk_root(monkeypatch):
+    # iconbitmap無効化
+    monkeypatch.setattr(
+        tk.Tk, "iconbitmap", lambda self, *a, **k: None)
+    root = tk.Tk()
+    root.withdraw()
+    yield root
+    root.destroy()
+```
+- テスト用に細工をした`tkinter.Tk`インスタンスを返すフィクスチャ
+- 細工の内容
+    - `monkeypatch.setattr(tk.Tk, "iconbitmap", lambda self, *a, **k: None)`: 
+        - `Tk`クラスの`iconbitmap()`メソッドを、〝引数で何を渡しても`None`を返すメソッド〟に差し替え
+    - `root.withdraw()`: 
+        - ウィンドウを非表示にする
+        - 「withdraw」は「引っ込める」という意味の英単語
+- `return`ではなく`yield`で返しているので、テストが終わった時点で次の`root.destroy()`に制御が移る
+    - teardownができる
+
+#### カスタムImageProcessorインスタンスを代用する
+```py
+class DummyImage:
+    size = (100, 200)
+
+class DummyProc:
+    def __init__(self, path):
+        self.image = DummyImage()
+    def calc_display_size(self, img, max_w, max_h):
+        return 50, 100, 0.5
+    def resize_for_display(self, img, w, h):
+        return img
+    
+@pytest.fixture
+def dummy_proc():
+    return DummyProc
+```
+- テスト用に`ImageProcessor`クラスを偽装した`DummyProc`クラスのインスタンスを返すフィクスチャ
+- `ImageProcessor`が内包しておくべき`PIL.Image`オブジェクトも`DummyImage`クラスに差し替え
+    - 画像サイズだけを偽装すれば良い
+    - -> 固定で`(100, 200)`にしておく
+- `DummyProc`には、`ImageProcessor`クラスが持つメソッドを最低限の実装で再現
+    - `image`属性
+        - `PIL.Image`オブジェクトを偽装した`DummyImage`オブジェクトをセット
+    - `display_size()`メソッド
+        - 固定で`(50, 100, 0.5)`を返す
+    - `resize_for_display()`メソッド
+        - 固定で`DummyImage`オブジェクトを返す
+
+#### 画像処理（含画像オブジェクトへの依存）を代用する
+```py
+@pytest.fixture
+def patch_image_dependencies(monkeypatch, dummy_proc):
+    monkeypatch.setattr(
+        "src.nakanuki_gui.main.ImageProcessor", dummy_proc)
+    monkeypatch.setattr(
+        "src.nakanuki_gui.main.ImageTk.PhotoImage", 
+        lambda * _: object())
+```
+- `main`モジュールにインポートされる次のクラスを差し替えるフィクスチャ
+    - カスタム`ImageProcessor`クラス
+        - -> `dummy_proc`フィクスチャに差し替え
+    - 画像をTkinterで表示するための`ImageTk.PhotoImage`クラス
+        - -> 何もしない空のオブジェクトに差し替え
+        - `lambda * _: object()`: 
+            - 引数に何が渡されても`object()`を返す
+            - `_`は引数を受け取るための変数
+            - `* _`なので、〝可変長引数〟、つまり複数の引数を受け取った場合はタプルとして`_`で受け取ることになる
+            - 利用しない変数であることを明示するため慣例に従い`_`を用いる
+- `main`モジュールで定義されている`NakanukiApp.load_image()`メソッド実行時の画像読み込み処理を偽装する
+
+#### ファイルダイアログを代用する
+```py
+@pytest.fixture
+def mock_file_dialog(tmp_path):
+    test_img = tmp_path / "sample.png"
+    test_img.touch()
+
+    with patch(
+        "src.nakanuki_gui.main.filedialog.askopenfilename", 
+        return_value=str(test_img)):
+        yield test_img
+```
+- ファイルダイアログによるファイルパス受け取りを差し替えるフィクスチャ
+- `main`モジュールにインポートされる`filedialog`クラスの`askopenfilename()`メソッドを偽装する
+- フィクスチャ内で、一時フォルダ（`tmp_path`）に`sample.png`という偽の画像ファイルを作成
+- `askopenfilename()`メソッドの返り値を`sample.png`のパス（文字列）に差し替え
+- `test_img`（`Path`オブジェクト）を返す
+    - この例の場合は、後処理がないので`return`でも動く
+    - ただ、フィクスチャの場合は〝後処理がある〟前提なので、`yield`を用いる
 
 ## `main.py`
 ```py
