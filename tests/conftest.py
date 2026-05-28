@@ -29,6 +29,14 @@ def dummy_proc():
     return DummyProc
 
 @pytest.fixture
+def patch_image_dependencies(monkeypatch, dummy_proc):
+    monkeypatch.setattr(
+        "src.nakanuki_gui.main.ImageProcessor", dummy_proc)
+    monkeypatch.setattr(
+        "src.nakanuki_gui.main.ImageTk.PhotoImage", 
+        lambda * _: object())
+
+@pytest.fixture
 def mock_file_dialog(tmp_path):
     test_img = tmp_path / "sample.png"
     test_img.touch()
@@ -37,11 +45,3 @@ def mock_file_dialog(tmp_path):
         "src.nakanuki_gui.main.filedialog.askopenfilename", 
         return_value=str(test_img)):
         yield test_img
-
-@pytest.fixture
-def patch_image_dependencies(monkeypatch, dummy_proc):
-    monkeypatch.setattr(
-        "src.nakanuki_gui.main.ImageProcessor", dummy_proc)
-    monkeypatch.setattr(
-        "src.nakanuki_gui.main.ImageTk.PhotoImage", 
-        lambda * _: object())
