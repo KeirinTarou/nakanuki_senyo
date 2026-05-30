@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Tuple
 import traceback
+from PIL import Image
 
 from config import (resource_path, CANVAS_SIZE)
 from src.nakanuki_core.nakanuki import nakanuki_image
@@ -170,31 +171,12 @@ class NakanukiApp:
 
     def nakanuki_and_save(self):
         """ 画像を中抜きしてエクスポート"""
-        if not self.original_image:
-            return
-        
-        try:
-            y_from = int(self.spin_from.get())
-            y_to = int(self.spin_to.get())
-        except ValueError:
-            return
-        
-        if y_from >= y_to:
-            # 不正範囲は黙って無視
-            return
-        
-        img = self.original_image
-        rgbed = img.convert("RGB")
-        add_break_line = self.var_add_break_line.get()
-        try:
-            out = nakanuki_image(rgbed, y_from, y_to, add_break_line)
-        except Exception as e:
-            log("ERROR in nakanuki:")
-            log(traceback.format_exc())
+        out = self._nakanuki_exec()
+        if out is None:
             return
 
         # ファイル名生成
-        src = Path(img.filename)
+        src = Path(self.original_image.filename)
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         out_name = f"{src.stem}_{ts}{src.suffix}"
 
@@ -207,6 +189,37 @@ class NakanukiApp:
             log("ERROR saving:")
             log(traceback.format_exc())
     
+    def _nakanuki_exec(self) -> Image.Image | None:
+        """ 画像の中抜き処理を行う"""
+        if not self.original_image:
+            return None
+        
+        try:
+            y_from = int(self.spin_from.get())
+            y_to = int(self.spin_to.get())
+        except ValueError:
+            return None
+        
+        # # 不正範囲 -> None
+        if y_from >= y_to:
+            return None
+        
+        # オリジナル画像
+        img = self.original_image
+        # RGBに変換
+        rgbed = img.convert("RGB")
+        # 省略線フラグ
+        add_break_line = self.var_add_break_line.get()
+
+        try:
+            out = nakanuki_image(rgbed, y_from, y_to, add_break_line)
+        except Exception:
+            log("ERROR in nakanuki: ")
+            log(traceback.format_exc())
+            return None
+        
+        return out
+
     # Internal methods
     @staticmethod
     def _calc_horizontal_line_coords( 
