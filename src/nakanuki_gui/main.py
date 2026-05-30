@@ -86,6 +86,12 @@ class NakanukiApp:
             text="画像を開く", 
             command=self.load_image
         ).pack(side=tk.LEFT, padx=5)
+        # 「中抜適用」ボタン
+        tk.Button(
+            btn_frame, 
+            text="中抜適用", 
+            command=self.apply_nakanuki
+        ).pack(side=tk.LEFT, padx=5)
         # 「中抜き！」ボタン
         tk.Button(
             btn_frame, 
@@ -188,7 +194,7 @@ class NakanukiApp:
             return
 
         # ファイル名生成
-        src = Path(self.original_image.filename)
+        src = self.src_path
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         out_name = f"{src.stem}_{ts}{src.suffix}"
 
@@ -258,6 +264,7 @@ class NakanukiApp:
         # キャンバスに表示
         self.original_image = out
         self._show_image_on_canvas(out)
+        self.update_lines()
 
     # Internal methods
     @staticmethod
