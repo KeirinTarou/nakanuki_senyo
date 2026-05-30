@@ -117,24 +117,36 @@ class NakanukiApp:
         # 画像高さ表示ラベルを更新
         self.var_height.set(f"Height: {h} px")
 
-        # 表示用に縮小
-        # リサイズ用のサイズを取得
-        max_w, max_h = CANVAS_SIZE[0], CANVAS_SIZE[1]
-        display_w, display_h, scale = proc.calc_display_size(img, max_w, max_h)
-        # display_scale属性にセット
-        self.display_scale = scale
-        # リサイズ後画像を取得
-        resized = proc.resize_for_display(img, display_w, display_h)
-        self.display_image = ImageTk.PhotoImage(resized)
-
-        # キャンバス中央に画像を表示
-        self.canvas.delete("all")
-        center_x, center_y = max_w / 2, max_h / 2
-        self.canvas.create_image(center_x, center_y, image=self.display_image)
+        # キャンバスに画像を表示
+        self._show_image_on_canvas(img)
 
         # Spinboxの最大値調整
         self.spin_from.config(to=h)
         self.spin_to.config(to=h)
+
+    def _show_image_on_canvas(self, img):
+        """ 画像をキャンバスに表示する"""
+        max_w, max_h = CANVAS_SIZE
+
+        proc = ImageProcessor.__new__(ImageProcessor)
+        display_w, display_h, scale = \
+            proc.calc_display_size(img, max_w, max_h)
+        
+        self.display_scale = scale
+
+        resized = \
+            proc.resize_for_display(img, display_w, display_h)
+        
+        self.display_image = ImageTk.PhotoImage(resized)
+
+        self.canvas.delete("all")
+
+        center_x, center_y = max_w / 2, max_h / 2
+
+        self.canvas.create_image(
+            center_x, 
+            center_y, 
+            image=self.display_image)
 
     def update_lines(self):
         """ 水平線の更新"""
@@ -219,6 +231,33 @@ class NakanukiApp:
             return None
         
         return out
+
+    def apply_nakanuki(self):
+        """ 中抜き画像を即キャンバスに反映"""
+        # 元画像が読み込まれていない -> 何もしない
+        if not self.original_image: 
+            return
+        
+        try:
+            y_from = int(self.spin_from.get())
+            y_to = int(self.spin_to.get())
+        # 不正状態、中抜きできない状態はすべてスルー
+        except ValueError:
+            return
+        if y_from >= y_to:
+            return
+        
+        # 中抜き画像作成
+        try:
+            out = self._nakanuki_exec()
+        except Exception:
+            log("ERROR in nakanuki: ")
+            log(traceback.format_exc())
+            return
+        
+        # キャンバスに表示
+        self.original_image = out
+        
 
     # Internal methods
     @staticmethod
