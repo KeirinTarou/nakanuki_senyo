@@ -125,6 +125,7 @@ class NakanukiApp:
 
         # キャンバスに画像を表示
         self._show_image_on_canvas(img)
+        self.update_lines()
 
         # Spinboxの最大値調整
         self.spin_from.config(to=h)
@@ -219,7 +220,7 @@ class NakanukiApp:
             return None
         
         # # 不正範囲 -> None
-        if y_from >= y_to:
+        if y_from > y_to:
             return None
         
         # オリジナル画像
@@ -264,6 +265,8 @@ class NakanukiApp:
         # キャンバスに表示
         self.original_image = out
         self._show_image_on_canvas(out)
+        self.var_from.set("0")
+        self.var_to.set("0")
         self.update_lines()
 
     # Internal methods
