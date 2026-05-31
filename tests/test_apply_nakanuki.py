@@ -52,4 +52,35 @@ def test_apply_nakanuki_updates_spinbox_max(
 
 def test_apply_nakanuki_updates_current_height(tk_root, monkeypatch):
     """ ｢中抜適用｣ボタンクリック -> 画像の高さ更新"""
-    pass
+    from src.nakanuki_gui.main import NakanukiApp
+    app = NakanukiApp(tk_root)
+
+    app.original_image = DummyImage()
+    app.spin_from = DummySpinbox("10")
+    app.spin_to = DummySpinbox("20")
+    app.var_add_break_line = \
+        type("", (), {"get": lambda self: False})()
+    
+    # _show_image_on_canvas()乗っ取り
+    monkeypatch.setattr(
+        app, 
+        "_show_image_on_canvas", 
+        lambda img: None
+    )
+    # _nakanuki_exec()乗っ取り
+    monkeypatch.setattr(
+        app, 
+        "_nakanuki_exec", 
+        lambda: DummyOutImage()
+    )
+    # update_lines()乗っ取り
+    monkeypatch.setattr(
+        app, 
+        "update_lines", 
+        lambda: None
+    )
+    # apply_nakanuki()実行
+    app.apply_nakanuki()
+
+    # ラベルに表示される画像高さは中抜き後の70のはず
+    assert app.var_height.get() == "Height: 70 px"
