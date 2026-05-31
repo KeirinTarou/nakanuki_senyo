@@ -32,6 +32,10 @@ class DummyPhotoImage:
         return 100
 
 @pytest.fixture
+def dummy_image():
+    return DummyImage
+
+@pytest.fixture
 def dummy_proc():
     return DummyProc
 

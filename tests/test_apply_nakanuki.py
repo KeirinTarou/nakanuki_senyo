@@ -1,6 +1,3 @@
-class DummyImage:
-        size = (100, 100)
-
 class DummyOutImage:
     size = (100, 70)
 
@@ -16,12 +13,12 @@ class DummySpinbox:
         self.max_value = kwargs.get("to")
 
 def test_apply_nakanuki_updates_spinbox_max(
-        tk_root, monkeypatch):
+        tk_root, monkeypatch, dummy_image):
     """ 「中抜き適用」ボタンクリック -> スピンボックスの最大値更新"""
     from src.nakanuki_gui.main import NakanukiApp
     app = NakanukiApp(tk_root)
 
-    app.original_image = DummyImage()
+    app.original_image = dummy_image
     app.spin_from = DummySpinbox("10")
     app.spin_to = DummySpinbox("20")
     app.var_add_break_line = \
@@ -50,12 +47,13 @@ def test_apply_nakanuki_updates_spinbox_max(
     assert app.spin_from.max_value == 70
     assert app.spin_to.max_value == 70
 
-def test_apply_nakanuki_updates_current_height(tk_root, monkeypatch):
+def test_apply_nakanuki_updates_current_height(
+        tk_root, monkeypatch, dummy_image):
     """ ｢中抜適用｣ボタンクリック -> 画像の高さ更新"""
     from src.nakanuki_gui.main import NakanukiApp
     app = NakanukiApp(tk_root)
 
-    app.original_image = DummyImage()
+    app.original_image = dummy_image
     app.spin_from = DummySpinbox("10")
     app.spin_to = DummySpinbox("20")
     app.var_add_break_line = \
