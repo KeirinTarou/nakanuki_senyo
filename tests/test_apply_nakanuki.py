@@ -1,24 +1,25 @@
-def test_apply_nakanuki_updates_spinbox_max(
-        tk_root, monkeypatch):
-    from src.nakanuki_gui.main import NakanukiApp
-    app = NakanukiApp(tk_root)
-
-    class DummyImage:
+class DummyImage:
         size = (100, 100)
 
-    class DummyOutImage:
-        size = (100, 70)
+class DummyOutImage:
+    size = (100, 70)
 
-    class DummySpinbox:
-        def __init__(self, value):
-            self.value = value
-            self.max_value = None
+class DummySpinbox:
+    def __init__(self, value):
+        self.value = value
+        self.max_value = None
 
-        def get(self):
-            return self.value
-        
-        def config(self, **kwargs):
-            self.max_value = kwargs.get("to")
+    def get(self):
+        return self.value
+    
+    def config(self, **kwargs):
+        self.max_value = kwargs.get("to")
+
+def test_apply_nakanuki_updates_spinbox_max(
+        tk_root, monkeypatch):
+    """ 「中抜き適用」ボタンクリック -> スピンボックスの最大値更新"""
+    from src.nakanuki_gui.main import NakanukiApp
+    app = NakanukiApp(tk_root)
 
     app.original_image = DummyImage()
     app.spin_from = DummySpinbox("10")
@@ -48,3 +49,7 @@ def test_apply_nakanuki_updates_spinbox_max(
 
     assert app.spin_from.max_value == 70
     assert app.spin_to.max_value == 70
+
+def test_apply_nakanuki_updates_current_height(tk_root, monkeypatch):
+    """ ｢中抜適用｣ボタンクリック -> 画像の高さ更新"""
+    pass
