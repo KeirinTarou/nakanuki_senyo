@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Tuple
 import traceback
+from PIL import Image
 
 from config import (resource_path, CANVAS_SIZE)
 from src.nakanuki_core.nakanuki import nakanuki_image
@@ -85,6 +86,12 @@ class NakanukiApp:
             text="画像を開く", 
             command=self.load_image
         ).pack(side=tk.LEFT, padx=5)
+        # 「中抜適用」ボタン
+        tk.Button(
+            btn_frame, 
+            text="中抜適用", 
+            command=self.apply_nakanuki
+        ).pack(side=tk.LEFT, padx=5)
         # 「中抜き！」ボタン
         tk.Button(
             btn_frame, 
@@ -116,24 +123,37 @@ class NakanukiApp:
         # 画像高さ表示ラベルを更新
         self.var_height.set(f"Height: {h} px")
 
-        # 表示用に縮小
-        # リサイズ用のサイズを取得
-        max_w, max_h = CANVAS_SIZE[0], CANVAS_SIZE[1]
-        display_w, display_h, scale = proc.calc_display_size(img, max_w, max_h)
-        # display_scale属性にセット
-        self.display_scale = scale
-        # リサイズ後画像を取得
-        resized = proc.resize_for_display(img, display_w, display_h)
-        self.display_image = ImageTk.PhotoImage(resized)
-
-        # キャンバス中央に画像を表示
-        self.canvas.delete("all")
-        center_x, center_y = max_w / 2, max_h / 2
-        self.canvas.create_image(center_x, center_y, image=self.display_image)
+        # キャンバスに画像を表示
+        self._show_image_on_canvas(img)
+        self.update_lines()
 
         # Spinboxの最大値調整
         self.spin_from.config(to=h)
         self.spin_to.config(to=h)
+
+    def _show_image_on_canvas(self, img: Image.Image):
+        """ 画像をキャンバスに表示する"""
+        max_w, max_h = CANVAS_SIZE
+
+        proc = ImageProcessor.__new__(ImageProcessor)
+        display_w, display_h, scale = \
+            proc.calc_display_size(img, max_w, max_h)
+        
+        self.display_scale = scale
+
+        resized = \
+            proc.resize_for_display(img, display_w, display_h)
+        
+        self.display_image = ImageTk.PhotoImage(resized)
+
+        self.canvas.delete("all")
+
+        center_x, center_y = max_w / 2, max_h / 2
+
+        self.canvas.create_image(
+            center_x, 
+            center_y, 
+            image=self.display_image)
 
     def update_lines(self):
         """ 水平線の更新"""
@@ -170,31 +190,12 @@ class NakanukiApp:
 
     def nakanuki_and_save(self):
         """ 画像を中抜きしてエクスポート"""
-        if not self.original_image:
-            return
-        
-        try:
-            y_from = int(self.spin_from.get())
-            y_to = int(self.spin_to.get())
-        except ValueError:
-            return
-        
-        if y_from >= y_to:
-            # 不正範囲は黙って無視
-            return
-        
-        img = self.original_image
-        rgbed = img.convert("RGB")
-        add_break_line = self.var_add_break_line.get()
-        try:
-            out = nakanuki_image(rgbed, y_from, y_to, add_break_line)
-        except Exception as e:
-            log("ERROR in nakanuki:")
-            log(traceback.format_exc())
+        out = self._nakanuki_exec()
+        if out is None:
             return
 
         # ファイル名生成
-        src = Path(img.filename)
+        src = self.src_path
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         out_name = f"{src.stem}_{ts}{src.suffix}"
 
@@ -207,6 +208,67 @@ class NakanukiApp:
             log("ERROR saving:")
             log(traceback.format_exc())
     
+    def _nakanuki_exec(self) -> Image.Image | None:
+        """ 画像の中抜き処理を行う"""
+        if not self.original_image:
+            return None
+        
+        try:
+            y_from = int(self.spin_from.get())
+            y_to = int(self.spin_to.get())
+        except ValueError:
+            return None
+        
+        # # 不正範囲 -> None
+        if y_from > y_to:
+            return None
+        
+        # オリジナル画像
+        img = self.original_image
+        # RGBに変換
+        rgbed = img.convert("RGB")
+        # 省略線フラグ
+        add_break_line = self.var_add_break_line.get()
+
+        try:
+            out = nakanuki_image(rgbed, y_from, y_to, add_break_line)
+        except Exception:
+            log("ERROR in nakanuki: ")
+            log(traceback.format_exc())
+            return None
+        
+        return out
+
+    def apply_nakanuki(self):
+        """ 中抜き画像を即キャンバスに反映"""
+        # 元画像が読み込まれていない -> 何もしない
+        if not self.original_image: 
+            return
+        
+        try:
+            y_from = int(self.spin_from.get())
+            y_to = int(self.spin_to.get())
+        # 不正状態、中抜きできない状態はすべてスルー
+        except ValueError:
+            return
+        if y_from >= y_to:
+            return
+        
+        # 中抜き画像作成
+        try:
+            out = self._nakanuki_exec()
+        except Exception:
+            log("ERROR in nakanuki: ")
+            log(traceback.format_exc())
+            return
+        
+        # キャンバスに表示
+        self.original_image = out
+        self._show_image_on_canvas(out)
+        self.var_from.set("0")
+        self.var_to.set("0")
+        self.update_lines()
+
     # Internal methods
     @staticmethod
     def _calc_horizontal_line_coords( 
