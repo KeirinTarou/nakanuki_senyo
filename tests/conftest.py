@@ -23,7 +23,14 @@ class DummyProc:
         return 50, 100, 0.5
     def resize_for_display(self, img, w, h):
         return img
+
+class DummyPhotoImage:
+    def width(self):
+        return 50
     
+    def height(self):
+        return 100
+
 @pytest.fixture
 def dummy_proc():
     return DummyProc
@@ -34,7 +41,7 @@ def patch_image_dependencies(monkeypatch, dummy_proc):
         "src.nakanuki_gui.main.ImageProcessor", dummy_proc)
     monkeypatch.setattr(
         "src.nakanuki_gui.main.ImageTk.PhotoImage", 
-        lambda * _: object())
+        lambda * _: DummyPhotoImage())
 
 @pytest.fixture
 def mock_file_dialog(tmp_path):
