@@ -128,8 +128,7 @@ class NakanukiApp:
         self.update_lines()
 
         # Spinboxの最大値調整
-        self.spin_from.config(to=h)
-        self.spin_to.config(to=h)
+        self._set_spinbox_max(img)
 
     def _show_image_on_canvas(self, img: Image.Image):
         """ 画像をキャンバスに表示する"""
@@ -267,12 +266,15 @@ class NakanukiApp:
         self._show_image_on_canvas(out)
         self.var_from.set("0")
         self.var_to.set("0")
+        # スピンボックスの最大値をセット
+        self._set_spinbox_max(out)
+        self.update_lines()
 
-        _, h = out.size
+    def _set_spinbox_max(self, img: Image.Image):
+        """ スピンボックスの最大値をセット"""
+        _, h = img.size
         self.spin_from.config(to=h)
         self.spin_to.config(to=h)
-
-        self.update_lines()
 
     # Internal methods
     @staticmethod
