@@ -267,6 +267,11 @@ class NakanukiApp:
         self._show_image_on_canvas(out)
         self.var_from.set("0")
         self.var_to.set("0")
+
+        _, h = out.size
+        self.spin_from.config(to=h)
+        self.spin_to.config(to=h)
+
         self.update_lines()
 
     # Internal methods
