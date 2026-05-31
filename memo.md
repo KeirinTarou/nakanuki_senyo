@@ -590,3 +590,250 @@ def test_save_path_save_uses_src_directory(
     assert saved_path["path"].parent == mock_file_dialog.parent
 
 ```
+
+## テストに関するメモ
+### ✅ conftest.py に引き上げるべき項目
+```py
+# ダミーオブジェクトクラスを集約
+class DummyImage:
+class DummyOutImage:
+class DummySpinbox:
+class DummyPhotoImage:
+class DummyProc:
+
+# 頻出するモック化フィクスチャ
+@pytest.fixture
+def image_fixture():
+    """複数サイズの test_image をパラメータ化"""
+
+@pytest.fixture
+def test_image_path():
+    """test_assets の画像を使用"""
+```
+
+### 🎯 追加すべきテストケース
+1. ImageProcessor クラス
+- ❌ 存在しないファイルパスを渡した場合
+- ❌ 無効な画像形式を渡した場合
+- ❌ None 状態の画像に resize_for_display() を呼ぶ
+- ✅ RGBA など異なる画像モードへの対応
+2. nakanuki_image() 関数
+- ✅ 基本的な中抜きはカバー済み
+- ❌ add_break_line=True の詳細検証
+- ❌ 異なる画像フォーマット（RGBA、グレースケール）での動作
+3. GUI 統合テスト
+- ❌ 画像ロード→中抜き→保存 の一連フロー
+- ❌ エラーハンドリング（不正ファイル選択時）
+- ❌ ウィジェット状態の同期性
+4. エッジケース
+- ❌ 0px 以下の画像に対する処理
+- ❌ y_from = y_to のケース（現在の仕様では？）
+- ❌ 1x1 ピクセルの極小画像
+
+### 📝 推奨される再構成案
+```bash
+tests/
+├── conftest.py                  # すべてのダミーオブジェクト、共通フィクスチャ
+├── unit/
+│   ├── test_nakanuki_image.py          # 中抜きロジック
+│   ├── test_image_processor.py         # 画像処理クラス
+│   └── test_edge_cases.py              # 新規：エッジケース
+├── integration/
+│   └── test_app_workflow.py            # 新規：GUI全体フロー
+└── fixtures/
+    └── test_assets.py                  # 新規：画像パスのヘルパー
+```
+
+```py
+# `conftest.py`の変更案
+import pytest
+from PIL import Image
+
+class DummyImage:
+    def __init__(self, size=(100, 200), mode="RGB"):
+        self.size = size
+        self.mode = mode
+
+    def convert(self, mode):
+        return self
+
+
+class DummyOutImage:
+    def __init__(self, size=(100, 70)):
+        self.size = size
+
+    def save(self, path):
+        path.write_text("dummy")
+
+
+class DummySpinbox:
+    def __init__(self, value):
+        self.value = value
+        self.max_value = None
+
+    def get(self):
+        return self.value
+
+    def config(self, **kwargs):
+        if "to" in kwargs:
+            self.max_value = kwargs["to"]
+
+
+class DummyBooleanVar:
+    def __init__(self, value=False):
+        self._value = value
+
+    def get(self):
+        return self._value
+
+    def set(self, value):
+        self._value = value
+
+class DummyProc:
+    def __init__(self, path):
+        self.image = DummyImage()
+
+    def calc_display_size(self, img, max_w, max_h):
+        return 50, 100, 0.5
+
+    def resize_for_display(self, img, w, h):
+        return img
+
+class DummyPhotoImage:
+    def width(self):
+        return 50
+
+    def height(self):
+        return 100
+
+@pytest.fixture
+def tk_root(monkeypatch):
+    # iconbitmap無効化
+    monkeypatch.setattr(
+        tk.Tk, "iconbitmap", lambda self, *a, **k: None)
+    root = tk.Tk()
+    root.withdraw()
+    yield root
+    root.destroy()
+
+@pytest.fixture
+def dummy_proc():
+    return DummyProc
+
+@pytest.fixture
+def dummy_image():
+    return DummyImage()
+
+@pytest.fixture
+def dummy_out_image():
+    return DummyOutImage()
+
+@pytest.fixture
+def dummy_spinbox():
+    return DummySpinbox
+
+@pytest.fixture
+def dummy_boolean_var():
+    return DummyBooleanVar(False)
+
+@pytest.fixture
+def sample_image_path(tmp_path):
+    test_img = tmp_path / "sample.png"
+    Image.new("RGB", (100, 100)).save(test_img)
+    return test_img
+
+@pytest.fixture
+def patch_image_dependencies(monkeypatch, dummy_proc):
+    monkeypatch.setattr(
+        "src.nakanuki_gui.main.ImageProcessor", dummy_proc)
+    monkeypatch.setattr(
+        "src.nakanuki_gui.main.ImageTk.PhotoImage",
+        lambda *_, **__: DummyPhotoImage())
+
+@pytest.fixture
+def mock_file_dialog(tmp_path):
+    test_img = tmp_path / "sample.png"
+    Image.new("RGB", (100, 100)).save(test_img)
+
+    with patch(
+        "src.nakanuki_gui.main.filedialog.askopenfilename",
+        return_value=str(test_img),
+    ):
+        yield test_img
+```
+
+```py
+# `test_apply_nakanuki.py`
+
+from src.nakanuki_gui.main import NakanukiApp
+
+def test_apply_nakanuki_updates_spinbox_max(
+        tk_root, monkeypatch, dummy_spinbox, dummy_boolean_var,
+        dummy_image, dummy_out_image):
+    """ 「中抜き適用」ボタンクリック -> スピンボックスの最大値更新"""
+    app = NakanukiApp(tk_root)
+
+    app.original_image = dummy_image
+    app.spin_from = dummy_spinbox("10")
+    app.spin_to = dummy_spinbox("20")
+    app.var_add_break_line = dummy_boolean_var
+    
+    monkeypatch.setattr(
+        app,
+        "_show_image_on_canvas",
+        lambda img: None
+    )
+    
+    monkeypatch.setattr(
+        app,
+        "_nakanuki_exec",
+        lambda: dummy_out_image
+    )
+
+    monkeypatch.setattr(
+        app,
+        "update_lines",
+        lambda: None
+    )
+
+    app.apply_nakanuki()
+
+    assert app.spin_from.max_value == 70
+    assert app.spin_to.max_value == 70
+
+def test_apply_nakanuki_updates_current_height(
+        tk_root, monkeypatch, dummy_spinbox, dummy_boolean_var,
+        dummy_image, dummy_out_image):
+    """ ｢中抜適用｣ボタンクリック -> 画像の高さ更新"""
+    app = NakanukiApp(tk_root)
+
+    app.original_image = dummy_image
+    app.spin_from = dummy_spinbox("10")
+    app.spin_to = dummy_spinbox("20")
+    app.var_add_break_line = dummy_boolean_var
+    
+    # _show_image_on_canvas()乗っ取り
+    monkeypatch.setattr(
+        app, 
+        "_show_image_on_canvas", 
+        lambda img: None
+    )
+    # _nakanuki_exec()乗っ取り
+    monkeypatch.setattr(
+        app, 
+        "_nakanuki_exec", 
+        lambda: dummy_out_image
+    )
+    # update_lines()乗っ取り
+    monkeypatch.setattr(
+        app, 
+        "update_lines", 
+        lambda: None
+    )
+    # apply_nakanuki()実行
+    app.apply_nakanuki()
+
+    # ラベルに表示される画像高さは中抜き後の70のはず
+    assert app.var_height.get() == "Height: 70 px"
+
+```
