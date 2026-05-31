@@ -31,9 +31,16 @@ class DummyPhotoImage:
     def height(self):
         return 100
 
+class DummyOutImage:
+    size = (100, 70)
+
 @pytest.fixture
 def dummy_image():
     return DummyImage
+
+@pytest.fixture
+def dummy_out_image():
+    return DummyOutImage
 
 @pytest.fixture
 def dummy_proc():
@@ -46,6 +53,21 @@ def patch_image_dependencies(monkeypatch, dummy_proc):
     monkeypatch.setattr(
         "src.nakanuki_gui.main.ImageTk.PhotoImage", 
         lambda * _: DummyPhotoImage())
+
+class DummySpinbox:
+    def __init__(self, value):
+        self.value = value
+        self.max_value = None
+
+    def get(self):
+        return self.value
+    
+    def config(self, **kwargs):
+        self.max_value = kwargs.get("to")
+
+@pytest.fixture
+def dummy_spinbox():
+    return DummySpinbox
 
 @pytest.fixture
 def mock_file_dialog(tmp_path):

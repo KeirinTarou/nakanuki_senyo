@@ -1,26 +1,12 @@
-class DummyOutImage:
-    size = (100, 70)
-
-class DummySpinbox:
-    def __init__(self, value):
-        self.value = value
-        self.max_value = None
-
-    def get(self):
-        return self.value
-    
-    def config(self, **kwargs):
-        self.max_value = kwargs.get("to")
-
 def test_apply_nakanuki_updates_spinbox_max(
-        tk_root, monkeypatch, dummy_image):
+        tk_root, monkeypatch, dummy_image, dummy_out_image, dummy_spinbox):
     """ 「中抜き適用」ボタンクリック -> スピンボックスの最大値更新"""
     from src.nakanuki_gui.main import NakanukiApp
     app = NakanukiApp(tk_root)
 
     app.original_image = dummy_image
-    app.spin_from = DummySpinbox("10")
-    app.spin_to = DummySpinbox("20")
+    app.spin_from = dummy_spinbox("10")
+    app.spin_to = dummy_spinbox("20")
     app.var_add_break_line = \
         type("", (), {"get": lambda self: False})()
     
@@ -33,7 +19,7 @@ def test_apply_nakanuki_updates_spinbox_max(
     monkeypatch.setattr(
         app, 
         "_nakanuki_exec", 
-        lambda: DummyOutImage()
+        lambda: dummy_out_image()
     )
 
     monkeypatch.setattr(
@@ -48,14 +34,14 @@ def test_apply_nakanuki_updates_spinbox_max(
     assert app.spin_to.max_value == 70
 
 def test_apply_nakanuki_updates_current_height(
-        tk_root, monkeypatch, dummy_image):
+        tk_root, monkeypatch, dummy_image, dummy_out_image, dummy_spinbox):
     """ ｢中抜適用｣ボタンクリック -> 画像の高さ更新"""
     from src.nakanuki_gui.main import NakanukiApp
     app = NakanukiApp(tk_root)
 
     app.original_image = dummy_image
-    app.spin_from = DummySpinbox("10")
-    app.spin_to = DummySpinbox("20")
+    app.spin_from = dummy_spinbox("10")
+    app.spin_to = dummy_spinbox("20")
     app.var_add_break_line = \
         type("", (), {"get": lambda self: False})()
     
@@ -69,7 +55,7 @@ def test_apply_nakanuki_updates_current_height(
     monkeypatch.setattr(
         app, 
         "_nakanuki_exec", 
-        lambda: DummyOutImage()
+        lambda: dummy_out_image()
     )
     # update_lines()乗っ取り
     monkeypatch.setattr(
