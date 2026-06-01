@@ -22,12 +22,6 @@ class NakanukiApp:
         self.root.resizable(False, False)
         root.iconbitmap(ICON_PATH)
 
-        # プレビュー領域
-        canv_w, canv_h = CANVAS_SIZE
-        self.canvas = tk.Canvas(
-            root, bg="gray", width=canv_w, height=canv_h)
-        self.canvas.pack(pady=10)
-
         # 画像データ
         self.original_image = None
         self.display_image = None
@@ -42,6 +36,13 @@ class NakanukiApp:
 
         # ラインID保持用属性
         self.line_ids = []
+
+        # UI
+        # 画像プレビュー領域（キャンバス）
+        canv_w, canv_h = CANVAS_SIZE
+        self.canvas = tk.Canvas(
+            root, bg="gray", width=canv_w, height=canv_h)
+        self.canvas.pack(pady=10)
 
         # UIパーツ群（1段目）
         # スピンボックス用（画像サイズ用ラベル・チェックボックス含む）用フレーム
