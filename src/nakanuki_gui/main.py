@@ -67,10 +67,10 @@ class NakanukiApp:
             textvariable=self.var_to, command=self.update_lines)
         self.spin_to.pack(side=tk.LEFT)
         # 「省略線追加」チェックボックス
-        tk.Checkbutton(
+        self.chk_add_breakline = tk.Checkbutton(
             spin_frame, text="省略線追加", 
-            variable=self.var_add_break_line
-        ).pack(side=tk.LEFT, padx=10)
+            variable=self.var_add_break_line)
+        self.chk_add_breakline.pack(side=tk.LEFT, padx=10)
 
         # trace 追加
         self.var_from.trace_add("write", lambda *args: self.update_lines())
