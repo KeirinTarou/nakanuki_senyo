@@ -18,6 +18,26 @@ def test_image_processor_calc_display_size():
     assert scale == 1/ 3
     assert (w, h) == (300, 200)
 
+def test_image_processor_calc_display_size_width_provided_zero():
+    """ widthに0が渡された -> 例外スロー"""
+    with pytest.raises(ValueError):
+        ImageProcessor.calc_display_size(0, 100)
+
+def test_image_processor_calc_display_size_height_provided_zero():
+    """ heightに0が渡された -> 例外スロー"""
+    with pytest.raises(ValueError):
+        ImageProcessor.calc_display_size(100, 0)
+
+def test_image_processor_calc_display_size_max_w_provided_zero():
+    """ max_wに0が渡された -> 例外スロー"""
+    with pytest.raises(ValueError):
+        ImageProcessor.calc_display_size(100, 100, 0, 400)
+
+def test_image_processor_calc_display_size_max_h_provided_zero():
+    """ max_hに0が渡された -> 例外スロー"""
+    with pytest.raises(ValueError):
+        ImageProcessor.calc_display_size(100, 100, 600, 0)
+
 def test_image_processor_resize_for_display():
     img = Image.new("RGB", (100, 100))
     proc = ImageProcessor()

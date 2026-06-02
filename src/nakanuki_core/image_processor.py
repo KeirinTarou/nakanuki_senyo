@@ -70,6 +70,14 @@ class ImageProcessor:
             - src/nakanuki_core/image_processor.py
         """
         # ガード
+        if width <= 0:
+            raise ValueError("width must be positive.")
+        if height <= 0:
+            raise ValueError("height must be positive.")
+        if max_w <= 0:
+            raise ValueError("max_w must be positive.")
+        if max_h <= 0:
+            raise ValueError("max_h must be positive.")
         
         scale = min(max_w / width, max_h / height, 1)
         return int(width * scale), int(height * scale), scale
