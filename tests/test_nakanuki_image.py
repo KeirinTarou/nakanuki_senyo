@@ -49,6 +49,4 @@ def test_nakanuki_image_same_values_provided():
     """ FromとToが同じ -> 元の画像を返す"""
     img = Image.new("RGB", (100, 100), "white")
     result = nakanuki_image(img, 50, 50)
-    assert result.width == 100
-    assert result.height == 100 # 中抜きなし
-
+    assert result is img
