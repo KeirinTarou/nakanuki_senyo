@@ -19,10 +19,11 @@ class DummyImage:
 class DummyProc:
     def __init__(self, path):
         self.image = DummyImage()
-    def calc_display_size(self, img, max_w, max_h):
-        return 50, 100, 0.5
     def resize_for_display(self, img, w, h):
         return img
+    @staticmethod
+    def calc_display_size(width, height, max_w, max_h):
+        return 50, 100, 0.5
 
 class DummyPhotoImage:
     def width(self):

@@ -13,9 +13,7 @@ def test_image_processor_load(tmp_path):
 
 def test_image_processor_calc_display_size():
     """ 表示画像サイズと倍率を計算することができる"""
-    img = Image.new("RGB", (900, 600))
-    proc = ImageProcessor()
-    w, h, scale = proc.calc_display_size(img, 450, 200)
+    w, h, scale = ImageProcessor.calc_display_size(900, 600, 450, 200)
     # より倍率の低い方に合わせるはず
     assert scale == 1/ 3
     assert (w, h) == (300, 200)

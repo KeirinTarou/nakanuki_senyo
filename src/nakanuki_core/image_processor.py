@@ -29,31 +29,6 @@ class ImageProcessor:
         self.image = img
         return img
     
-    def calc_display_size(
-            self, img: Image.Image | None=None, 
-            max_w: int=600, max_h: int=400) -> Tuple[int, int, float]:
-        """ 表示用リサイズ後のサイズのタプルを返す
-        
-        :param img: Imageオブジェクト
-        :type img: Image | None
-        :param max_w: リサイズ後の画像の最大幅
-        :type max_w: int
-        :param max_h: リサイズ後の画像の最大高さ
-        :type max_w: int
-        :return: リサイズ後の幅、高さ、表示倍率のタプル
-        :rtype: Tuple[int, int, float]
-        .. note::
-            - src/nakanuki_core/image_processor.py
-        """
-        if img is None:
-            img = self.image
-        # ガード
-        if img is None:
-            raise ValueError("calc_display_size: image is not loaded.")
-        w, h = img.size
-        scale = min(max_w / w, max_h / h, 1)
-        return int(w * scale), int(h * scale), scale
-    
     def resize_for_display(
             self, img: Image.Image | None, 
             display_w: int, display_h: int) -> Image.Image:
@@ -74,3 +49,27 @@ class ImageProcessor:
         if img is None:
             raise ValueError("calc_display_size: image is not loaded.")
         return img.resize((display_w, display_h), Image.LANCZOS)
+    
+    @staticmethod
+    def calc_display_size(
+            width: int, height: int, 
+            max_w: int=600, max_h: int=400) -> Tuple[int, int, float]:
+        """ 表示用リサイズ後のサイズのタプルを返す
+        
+        :param width: 画像の幅
+        :type width: int
+        :param height: 画像の高さ
+        :type height: int
+        :param max_w: リサイズ後の画像の最大幅
+        :type max_w: int
+        :param max_h: リサイズ後の画像の最大高さ
+        :type max_w: int
+        :return: リサイズ後の幅、高さ、表示倍率のタプル
+        :rtype: Tuple[int, int, float]
+        .. note::
+            - src/nakanuki_core/image_processor.py
+        """
+        # ガード
+        
+        scale = min(max_w / width, max_h / height, 1)
+        return int(width * scale), int(height * scale), scale

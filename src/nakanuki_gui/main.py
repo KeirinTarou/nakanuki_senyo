@@ -133,11 +133,12 @@ class NakanukiApp:
 
     def _show_image_on_canvas(self, img: Image.Image):
         """ 画像をキャンバスに表示する"""
+        w, h = img.size
         max_w, max_h = CANVAS_SIZE
 
         proc = ImageProcessor.__new__(ImageProcessor)
         display_w, display_h, scale = \
-            proc.calc_display_size(img, max_w, max_h)
+            proc.calc_display_size(w, h, max_w, max_h)
         
         self.display_scale = scale
 

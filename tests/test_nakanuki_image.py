@@ -9,6 +9,7 @@ from src.nakanuki_core.nakanuki import nakanuki_image
 #   ✅- y_fromが負の数のときは0に丸める
 #   ✅- y_fromが画像高さを少しでも超えたら画像高さに丸める
 #   ✅- y_fromが画像高さを超えるときは画像高さに丸める
+#   ✅- y_fromとy_toが同じ -> 元画像を返す
 
 def test_nakanuki_image_normal():
     """ 100 x 100の画像を30-70で中抜き -> 100 x 60の画像"""
@@ -31,13 +32,23 @@ def test_nakanuki_image_clamp_behavior():
     assert result.height == 50
 
 def test_nakanuki_image_y_to_upper_bound_clamp():
+    """ y_fromが画像高さを少しでも超えたら画像高さに丸める"""
     img = Image.new("RGB", (100, 100), "white")
     result = nakanuki_image(img, 30, 101)
     assert result.width == 100
     assert result.height == 30
 
 def test_nakanuki_image_y_to_extreme_upper_value():
+    """ y_fromが画像高さを超えるときは画像高さに丸める"""
     img = Image.new("RGB", (100, 100), "white")
     result = nakanuki_image(img, 30, 999)
     assert result.width == 100
     assert result.height == 30
+
+def test_nakanuki_image_same_values_provided():
+    """ FromとToが同じ -> 元の画像を返す"""
+    img = Image.new("RGB", (100, 100), "white")
+    result = nakanuki_image(img, 50, 50)
+    assert result.width == 100
+    assert result.height == 100 # 中抜きなし
+
