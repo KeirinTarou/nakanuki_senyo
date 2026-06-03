@@ -15,6 +15,7 @@ from src.nakanuki_core.nakanuki import nakanuki_image
 #   ✅- 省略線オン/オフで結果が変わる
 #   ✅- add_break_lineをTrueにすると省略線を追加する
 #   ✅- 中抜き画像の外側にはみ出した省略線はカットされる
+#   ✅- 中抜き後、画像モードが維持される
 
 def test_nakanuki_image_normal():
     """ 100 x 100の画像を30-70で中抜き -> 100 x 60の画像"""
@@ -125,3 +126,17 @@ def test_nakanuki_image_break_line_is_clipped_when_overflow(monkeypatch):
     assert result.getpixel((50, 29)) == (255, 0, 0)
     # 中抜き後画像の上から31ピクセル目のピクセルが白のはず
     assert result.getpixel((50, 30)) == (255, 255, 255)
+
+@pytest.mark.parametrize(
+        "mode", ["RGB", "RGBA", "L"])
+def test_nakanuki_image_preserve_image_mode(mode):
+    """ 中抜き後、画像モードが維持される
+    
+    .. note::
+    - @pytest.mark.parametrize()使用
+        - `mode`にリスト内の3つのパラメータを順に割り当てる
+        - パラメータの数だけテストを行う
+    """
+    img = Image.new(mode, (100, 100))
+    result = nakanuki_image(img, 30, 70)
+    assert result.mode == mode
