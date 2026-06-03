@@ -179,7 +179,7 @@ class NakanukiApp:
         img = self.display_image
         img_w, img_h = img.width(), img.height()
         (xf0, yf0, xf1, yf1), (xt0, yt0, xt1, yt1) = \
-            self._calc_horizontal_line_coords(
+            self.calc_horizontal_line_coords(
                 (disp_w, disp_h), (img_w, img_h) , 
                 self.display_scale, y_from, y_to)
         # ライン描画
@@ -283,7 +283,7 @@ class NakanukiApp:
 
     # Internal methods
     @staticmethod
-    def _calc_horizontal_line_coords( 
+    def calc_horizontal_line_coords( 
             canvas_size: Tuple[int, int], 
             img_pixel_size: Tuple[int, int], 
             display_scale: float, 
