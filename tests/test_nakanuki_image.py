@@ -57,6 +57,28 @@ def test_nakanuki_image_add_break_line_causes_difference():
     # 中抜きサイズは同じで省略線の有無のみ異なる
     result1 = nakanuki_image(img, 30, 70, True)
     result2 = nakanuki_image(img, 30, 70, False)
-    # 省略線の有無で
+    # 省略線の有無で画像のサイズが変わる
     assert result1.tobytes() != result2.tobytes()
 
+def test_nakanuki_image_add_break_line(monkeypatch):
+    """ add_break_lineをTrueにすると省略線を追加する"""
+    img = Image.new("RGB", (100, 100), "white")
+    # 赤一色のダミー省略線を作る
+    dummy_break_img = \
+        Image.new("RGBA", (100, 40), (255, 0, 0, 255))
+    
+    # nakanukiモジュール内の`Image.open()`を差し替え
+    # どんなpathが渡されても`dummy_break_img`を返す
+    monkeypatch.setattr(
+        "src.nakanuki_core.nakanuki.Image.open", 
+        lambda path: dummy_break_img)
+    
+    # nakanuki_image()で中抜き & ダミー省略線貼り付け実行
+    # 30 - 70の範囲を中抜きし、省略線を施す
+    result = \
+        nakanuki_image(img, 30, 70, add_break_line=True)
+    
+    # 省略線の範囲内のピクセルは赤のはず
+    assert result.getpixel((50, 30)) == (255, 0, 0)
+    # 省略線の範囲外のピクセルは白のはず
+    assert result.getpixel((50, 5)) == (255, 255, 255)
