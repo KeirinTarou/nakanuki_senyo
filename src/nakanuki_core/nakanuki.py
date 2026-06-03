@@ -22,17 +22,21 @@ def nakanuki_image(
     ..note::
         - src/nakanuki_core/nakanuki.py
     """
-    # y_fromとy_toがともに`0`
+    # y_fromとy_toがともに`0` -> 元画像を返す
     if y_from == 0 and y_to == 0:
         return img
 
+    # y_fromがy_to以上 -> 例外スロー
     if y_from >= y_to:
         raise ValueError("y_from must be less than y_to.")
-    
-    w, h = img.size
 
+    w, h = img.size
     y_from = max(0, min(y_from, h))
     y_to = max(0, min(y_to, h))
+
+    # 全削除となるパターン -> 例外スロー
+    if y_to - y_from == h:
+        raise ValueError("cropped image height must be at least 1 px.")
 
     top = img.crop((0, 0, w, y_from))
     bottom = img.crop((0, y_to, w, h))

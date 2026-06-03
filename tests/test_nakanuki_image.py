@@ -30,6 +30,12 @@ def test_nakanuki_image_no_range():
     with pytest.raises(ValueError):
         nakanuki_image(img, 50, 50)
 
+def test_nakanuki_image_cropped_height_must_be_positive():
+    """ 中抜き後のサイズが0 -> ValueError例外を吐く"""
+    img = Image.new("RGB", (100, 100), "white")
+    with pytest.raises(ValueError):
+        nakanuki_image(img, 0, 100)
+
 def test_nakanuki_image_clamp_behavior():
     """ y_from < 0 は0に補正"""
     img = Image.new("RGB", (100, 100), "white")
