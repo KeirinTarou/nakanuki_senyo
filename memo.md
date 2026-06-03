@@ -657,7 +657,7 @@ def test_image_path():
 ### 🎯 追加すべきテストケース
 1. ImageProcessor クラス
 - ✅ 存在しないファイルパスを渡した場合
-- ❌ 無効な画像形式を渡した場合
+- ✅ 無効な画像形式を渡した場合
 - ❌ None 状態の画像に resize_for_display() を呼ぶ
 - ✅ RGBA など異なる画像モードへの対応
 2. nakanuki_image() 関数

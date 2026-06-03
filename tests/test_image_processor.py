@@ -50,3 +50,10 @@ def test_image_processor_file_not_found():
     """ 存在しないファイルを開こうとした -> 例外スロー"""
     with pytest.raises(ValueError):
         ImageProcessor("not_fount.png")
+
+def test_image_processor_load_invalid_image(tmp_path):
+    """ 画像でないファイルを渡した -> 例外スロー"""
+    file_path = tmp_path / "dummy.txt"
+    file_path.write_text("foo")
+    with pytest.raises(ValueError):
+        ImageProcessor(file_path)
