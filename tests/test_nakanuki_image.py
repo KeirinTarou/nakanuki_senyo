@@ -6,10 +6,15 @@ from src.nakanuki_core.nakanuki import nakanuki_image
 #  TODO:
 #   ✅- 100 x 100の画像を30-70で中抜き -> 100 x 60の画像
 #   ✅- FromよりToが小さい -> ValueError例外を吐く
+#   ✅- 0以外でFromとToが同じ -> ValueError例外を吐く
+#   ✅- 中抜き後のサイズが0 -> ValueError例外を吐く
 #   ✅- y_fromが負の数のときは0に丸める
 #   ✅- y_fromが画像高さを少しでも超えたら画像高さに丸める
 #   ✅- y_fromが画像高さを超えるときは画像高さに丸める
-#   ✅- y_fromとy_toが同じ -> 元画像を返す
+#   ✅- FromとToがともに0 -> 元の画像を返す
+#   ✅- 省略線オン/オフで結果が変わる
+#   ✅- add_break_lineをTrueにすると省略線を追加する
+#   ✅- 中抜き画像の外側にはみ出した省略線はカットされる
 
 def test_nakanuki_image_normal():
     """ 100 x 100の画像を30-70で中抜き -> 100 x 60の画像"""
@@ -94,3 +99,29 @@ def test_nakanuki_image_add_break_line(monkeypatch):
     assert result.getpixel((50, 30)) == (255, 0, 0)
     # 省略線の範囲外のピクセルは白のはず
     assert result.getpixel((50, 5)) == (255, 255, 255)
+
+def test_nakanuki_image_break_line_is_clipped_when_overflow(monkeypatch):
+    """ 中抜き画像の外側にはみ出した省略線はカットされる"""
+    img = Image.new("RGB", (100, 100), "white")
+    # 赤一色のダミー省略線を作る
+    dummy_break_img = \
+        Image.new("RGBA", (100, 40), (255, 0, 0, 255))
+    
+    # nakanukiモジュール内の`Image.open()`を差し替え
+    # どんなpathが渡されても`dummy_break_img`を返す
+    monkeypatch.setattr(
+        "src.nakanuki_core.nakanuki.Image.open", 
+        lambda path: dummy_break_img)
+    
+    # nakanuki_image()で中抜き & ダミー省略線貼り付け実行
+    # 10 - 50の範囲を中抜きし、省略線を施す
+    result = \
+        nakanuki_image(img, 10, 50, add_break_line=True)
+    
+    # 省略線の上10ピクセル分が中抜き後画像の外にはみ出してカットされるはず
+    # 中抜き後画像の上端のピクセルは赤のはず
+    assert result.getpixel((50, 0)) == (255, 0, 0)
+    # 中抜き後画像の上から30ピクセル目のピクセルも赤のはず
+    assert result.getpixel((50, 29)) == (255, 0, 0)
+    # 中抜き後画像の上から31ピクセル目のピクセルが白のはず
+    assert result.getpixel((50, 30)) == (255, 255, 255)
