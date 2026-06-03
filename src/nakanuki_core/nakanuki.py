@@ -22,12 +22,12 @@ def nakanuki_image(
     ..note::
         - src/nakanuki_core/nakanuki.py
     """
-    if y_from > y_to:
-        raise ValueError("y_from must be less than y_to.")
-    
-    # y_from, y_toが同じ -> そのまま元画像を返す
-    if y_from == y_to:
+    # y_fromとy_toがともに`0`
+    if y_from == 0 and y_to == 0:
         return img
+
+    if y_from >= y_to:
+        raise ValueError("y_from must be less than y_to.")
     
     w, h = img.size
 

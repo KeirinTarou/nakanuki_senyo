@@ -24,6 +24,12 @@ def test_nakanuki_image_invalid_range():
     with pytest.raises(ValueError):
         nakanuki_image(img, 70, 30)
 
+def test_nakanuki_image_no_range():
+    """ 0以外でFromとToが同じ -> ValueError例外を吐く"""
+    img = Image.new("RGB", (100, 100), "white")
+    with pytest.raises(ValueError):
+        nakanuki_image(img, 50, 50)
+
 def test_nakanuki_image_clamp_behavior():
     """ y_from < 0 は0に補正"""
     img = Image.new("RGB", (100, 100), "white")
@@ -46,9 +52,9 @@ def test_nakanuki_image_y_to_extreme_upper_value():
     assert result.height == 30
 
 def test_nakanuki_image_same_values_provided():
-    """ FromとToが同じ -> 元の画像を返す"""
+    """ FromとToがともに0 -> 元の画像を返す"""
     img = Image.new("RGB", (100, 100), "white")
-    result = nakanuki_image(img, 50, 50)
+    result = nakanuki_image(img, 0, 0)
     assert result is img
 
 def test_nakanuki_image_add_break_line_causes_difference():
