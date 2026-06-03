@@ -50,3 +50,13 @@ def test_nakanuki_image_same_values_provided():
     img = Image.new("RGB", (100, 100), "white")
     result = nakanuki_image(img, 50, 50)
     assert result is img
+
+def test_nakanuki_image_add_break_line_causes_difference():
+    """ 省略線オン/オフで結果が変わる"""
+    img = Image.new("RGB", (100, 100), "white")
+    # 中抜きサイズは同じで省略線の有無のみ異なる
+    result1 = nakanuki_image(img, 30, 70, True)
+    result2 = nakanuki_image(img, 30, 70, False)
+    # 省略線の有無で
+    assert result1.tobytes() != result2.tobytes()
+

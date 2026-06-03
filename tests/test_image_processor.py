@@ -39,6 +39,7 @@ def test_image_processor_calc_display_size_max_h_provided_zero():
         ImageProcessor.calc_display_size(100, 100, 600, 0)
 
 def test_image_processor_resize_for_display():
+    """ 指定したサイズにリサイズされる"""
     img = Image.new("RGB", (100, 100))
     proc = ImageProcessor()
     resized = proc.resize_for_display(img, 50, 50)
