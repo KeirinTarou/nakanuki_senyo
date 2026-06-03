@@ -57,3 +57,9 @@ def test_image_processor_load_invalid_image(tmp_path):
     file_path.write_text("foo")
     with pytest.raises(ValueError):
         ImageProcessor(file_path)
+
+def test_image_processor_resize_for_display_without_image():
+    """ 画像未読み込みでリサイズしようとした -> 例外スロー"""
+    proc = ImageProcessor()
+    with pytest.raises(ValueError):
+        proc.resize_for_display(None, 50, 50)
