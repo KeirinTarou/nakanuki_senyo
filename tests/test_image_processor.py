@@ -45,3 +45,8 @@ def test_image_processor_resize_for_display():
     resized = proc.resize_for_display(img, 50, 50)
     assert isinstance(img, Image.Image)
     assert resized.size == (50, 50)
+
+def test_image_processor_file_not_found():
+    """ 存在しないファイルを開こうとした -> 例外スロー"""
+    with pytest.raises(ValueError):
+        ImageProcessor("not_fount.png")
