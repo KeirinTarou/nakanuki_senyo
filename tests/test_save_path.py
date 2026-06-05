@@ -1,7 +1,11 @@
 from pathlib import Path
 
+# TODO: 
+#   ✅- ファイルダイアログからファイルパスを受け取ることができる
+#   ✅- エクスポート先フォルダは元ファイルのフォルダと同じ
+
 def test_save_path_load_image_sets_src_path(
-        tk_root, monkeypatch, patch_image_dependencies, mock_file_dialog):
+        tk_root, monkeypatch, patch_load_image_dependencies, mock_file_dialog):
     """ ファイルダイアログからファイルパスを受け取ることができる"""
     from src.nakanuki_gui.main import NakanukiApp
     app = NakanukiApp(tk_root)
@@ -14,7 +18,8 @@ def test_save_path_load_image_sets_src_path(
     assert app.src_path == mock_file_dialog
 
 def test_save_path_save_uses_src_directory(
-        tk_root, monkeypatch, patch_image_dependencies, mock_file_dialog):
+        tk_root, monkeypatch, patch_load_image_dependencies, mock_file_dialog):
+    """ エクスポート先フォルダは元ファイルのフォルダと同じ"""
     from src.nakanuki_gui.main import NakanukiApp
     app = NakanukiApp(tk_root)
 

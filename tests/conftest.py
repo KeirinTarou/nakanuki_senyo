@@ -44,13 +44,18 @@ def dummy_out_image():
     return DummyOutImage
 
 @pytest.fixture
-def dummy_proc():
-    return DummyProc
-
-@pytest.fixture
-def patch_image_dependencies(monkeypatch, dummy_proc):
+def patch_load_image_dependencies(monkeypatch):
+    """ NakanukiApp.load_image()メソッドの依存クラスをテスト用ダミーに差し替える
+    
+    .. note::
+    - 下記依存を解消するために使う
+        - load_image(): ImageProcessorに依存
+        - load_image() -> _show_image_on_canvas: ImageTk.PhotoImageに依存
+    """
+    # ImageProcessorクラスが呼ばれたらDummyProcクラスに差し替える
     monkeypatch.setattr(
-        "src.nakanuki_gui.main.ImageProcessor", dummy_proc)
+        "src.nakanuki_gui.main.ImageProcessor", DummyProc)
+    # ImageTk.PhotoImageクラスはDummyPhotoImageクラスに差し替える
     monkeypatch.setattr(
         "src.nakanuki_gui.main.ImageTk.PhotoImage", 
         lambda * _: DummyPhotoImage())
