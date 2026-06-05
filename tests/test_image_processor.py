@@ -2,6 +2,18 @@ import pytest
 from PIL import Image
 from src.nakanuki_core.image_processor import ImageProcessor
 
+#  TODO:
+#   ✅- 画像のファイルパスから画像をロードできる
+#   ✅- 表示画像サイズと倍率を計算することができる
+#   ✅- widthに0が渡された -> 例外スロー
+#   ✅- heightに0が渡された -> 例外スロー
+#   ✅- max_wに0が渡された -> 例外スロー
+#   ✅- max_hに0が渡された -> 例外スロー
+#   ✅- 指定したサイズにリサイズされる
+#   ✅- 存在しないファイルを開こうとした -> 例外スロー
+#   ✅- 画像でないファイルを渡した -> 例外スロー
+#   ✅- 画像未読み込みでリサイズしようとした -> 例外スロー
+
 def test_image_processor_load(tmp_path):
     """ 画像のファイルパスから画像をロードできる"""
     img_path = tmp_path / "test.png"
