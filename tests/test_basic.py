@@ -1,3 +1,5 @@
+# アプリの依存モジュールインポートを保証するテスト
+
 # TODO:
 #   ✅- import構造が壊れていない
 #   ✅- nakanukiモジュールのnakanuki_image()が呼べる
