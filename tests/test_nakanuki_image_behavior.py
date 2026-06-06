@@ -2,6 +2,8 @@ from PIL import Image
 
 from src.nakanuki_core.nakanuki import nakanuki_image
 
+# 画像の中抜変換処理を行うnakanuki_image()関数の動作保証テスト
+
 # TODO:
 #   ✅- 正しく中抜きされる
 #   ✅- 画像モードが変わらない
