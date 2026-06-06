@@ -2,6 +2,8 @@ from PIL import Image
 
 from src.nakanuki_core.nakanuki import nakanuki_image
 
+# nakanuki_image()による処理後の画像が壊れていないことを保証するテスト
+
 # TODO: -> ✅DONE
 #   ✅- 中抜き処理で画像の幅は変わらない
 #   ✅- 中抜き後の高さが正しく計算されている
