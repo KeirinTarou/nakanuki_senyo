@@ -3,6 +3,8 @@ import pytest
 
 from src.nakanuki_core.nakanuki import nakanuki_image
 
+# 中抜処理を行うnakanuki_image()関数の動作保証テスト
+
 #  TODO:
 #   ✅- 100 x 100の画像を30-70で中抜き -> 100 x 60の画像
 #   ✅- FromよりToが小さい -> ValueError例外を吐く
