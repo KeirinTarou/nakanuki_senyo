@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 @pytest.fixture
 def tk_root(monkeypatch):
+    """ テスト用のダミーtkinter.Tkインスタンスを返す"""
     # iconbitmap無効化
     monkeypatch.setattr(
         tk.Tk, "iconbitmap", lambda self, *a, **k: None)
