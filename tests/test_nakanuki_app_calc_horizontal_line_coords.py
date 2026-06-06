@@ -1,5 +1,6 @@
 from src.nakanuki_gui.main import NakanukiApp
 
+# 水平線の座標計算ロジックを保証するテスト
 # TODO:
 #   ✅- 幅・高さともにキャンバスよりも大きい
 #   ✅- 幅・高さともにキャンバスよりも小さい
