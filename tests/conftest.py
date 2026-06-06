@@ -16,6 +16,10 @@ def tk_root(monkeypatch):
 class DummyImage:
     size = (100, 200)
 
+@pytest.fixture
+def dummy_image():
+    return DummyImage
+
 class DummyProc:
     def __init__(self, path):
         self.image = DummyImage()
@@ -36,12 +40,21 @@ class DummyOutImage:
     size = (100, 70)
 
 @pytest.fixture
-def dummy_image():
-    return DummyImage
-
-@pytest.fixture
 def dummy_out_image():
     return DummyOutImage
+
+class DummyBooleanVar:
+    """ get()メソッドを呼んだらFalseを返すだけのクラス
+    
+    .. note::
+    - tk.BooleanVarクラスを偽装したダミークラス
+    """
+    def get(self):
+        return False
+    
+@pytest.fixture
+def dummy_boolean_var():
+    return DummyBooleanVar
 
 @pytest.fixture
 def patch_load_image_dependencies(monkeypatch):
