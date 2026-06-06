@@ -2,6 +2,8 @@ import pytest
 from PIL import Image
 from src.nakanuki_core.image_processor import ImageProcessor
 
+# キャンバス表示用に画像を変換するImageProcessorクラスの動作保証テスト
+
 #  TODO:
 #   ✅- 画像のファイルパスから画像をロードできる
 #   ✅- 表示画像サイズと倍率を計算することができる
