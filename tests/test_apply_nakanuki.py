@@ -32,7 +32,7 @@ def test_apply_nakanuki_updates_spinbox_max(
     monkeypatch.setattr(
         app, 
         "_nakanuki_exec", 
-        lambda: dummy_out_image()
+        lambda: dummy_out_image
     )
     # 水平線を更新するupdate_lines()を差し替え
     monkeypatch.setattr(
@@ -70,7 +70,7 @@ def test_apply_nakanuki_updates_current_height(
     monkeypatch.setattr(
         app, 
         "_nakanuki_exec", 
-        lambda: dummy_out_image()
+        lambda: dummy_out_image
     )
     # update_lines()差し替え
     monkeypatch.setattr(

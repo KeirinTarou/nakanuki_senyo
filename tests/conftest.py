@@ -15,11 +15,14 @@ def tk_root(monkeypatch):
 
 # ImageProcessorを偽装
 class DummyImage:
+    def convert(self, mode):
+        return self
+    filename = None
     size = (100, 200)
 
 @pytest.fixture
 def dummy_image():
-    return DummyImage
+    return DummyImage()
 
 class DummyProc:
     def __init__(self, path):
@@ -38,11 +41,18 @@ class DummyPhotoImage:
         return 100
 
 class DummyOutImage:
+    """ nakanuki_image()の返り値を偽装するダミーImageオブジェクト"""
     size = (100, 70)
+    def __init__(self):
+        self.saved_path = None
+    
+    def save(self, path):
+        self.saved_path = path
 
 @pytest.fixture
 def dummy_out_image():
-    return DummyOutImage
+    """ nakanuki_image()の返り値を偽装するダミーImageオブジェクトを返す"""
+    return DummyOutImage()
 
 class DummyBooleanVar:
     """ get()メソッドを呼んだらFalseを返すだけのクラス
@@ -55,7 +65,12 @@ class DummyBooleanVar:
     
 @pytest.fixture
 def dummy_boolean_var():
-    return DummyBooleanVar
+    """ tk.BooleanVarのダミーインスタンスを返す
+    
+    .. note::
+    - get()は常にFalseを返す
+    """
+    return DummyBooleanVar()
 
 @pytest.fixture
 def patch_load_image_dependencies(monkeypatch):
