@@ -7,15 +7,13 @@ from src.nakanuki_core.nakanuki import nakanuki_image
 # TODO:
 #   ✅- 正しく中抜きされる
 #   ✅- 画像モードが変わらない
-#   ✅- 画像モードが変わらない
 #   ✅- 保存後再読み込みしても壊れない
 #   ✅- 中抜き後の画像が壊れていない
 #   ✅- 中抜き後黒化していない
 #   ✅- RGB変換して保存した画像をRGB形式で開くことができる
 #   ✅- 中抜き後の画像をRGB変換しても壊れない 
 
-
-def test_nakanuki_image_edge_pixels():
+def test_nakanuki_image_regression_edge_pixels():
     """ 正しく中抜きされる"""
     img = Image.new("RGB", (100, 100))
     # 上半分を赤、下半分を青に塗る
@@ -33,7 +31,7 @@ def test_nakanuki_image_edge_pixels():
     # 最終的な高さは中抜き後の高さのはず
     assert result.height == 80 # 100 - (60 - 40)
 
-def test_nakanuki_image_rgba_basic():
+def test_nakanuki_image_regression_rgba_basic():
     """ 中抜き後、画像モードが変わらない"""
     img = Image.new("RGBA", (100, 100), (255, 0, 0, 128))
     result = nakanuki_image(img, 30, 70)
@@ -44,7 +42,7 @@ def test_nakanuki_image_rgba_basic():
     # modeが壊れていないはず
     assert result.mode == "RGBA"
 
-def test_nakanuki_image_save_and_reload(tmp_path):
+def test_nakanuki_image_regression_save_and_reload(tmp_path):
     """ 保存後再読み込みしても壊れていない"""
     img = Image.new("RGB", (100, 100), "white")
     result = nakanuki_image(img, 30, 70)
@@ -54,7 +52,7 @@ def test_nakanuki_image_save_and_reload(tmp_path):
     assert reloaded.size == result.size
     assert reloaded.mode == result.mode
 
-def test_nakanuki_image_blacken_regression(tmp_path):
+def test_nakanuki_image_regression_blacken_regression(tmp_path):
     """ 中抜き後の画像が壊れていない"""
     img = Image.open("test_assets/BA-90.png")
     result = nakanuki_image(img, 320, 520)
@@ -65,14 +63,14 @@ def test_nakanuki_image_blacken_regression(tmp_path):
     # 壊れていないことの検証
     assert reloaded.size == result.size
 
-def test_nakanuki_image_pixel_integrity():
+def test_nakanuki_image_regression_pixel_integrity():
     """ 中抜き後黒化していない"""
     img = Image.open("test_assets/BA-90.png")
     result = nakanuki_image(img, 320, 520)
     # 黒化確認
     assert result.getpixel((10, 10)) != (0, 0, 0)
 
-def test_nakanuki_image_rgb_conversion_save_roundtrip_(tmp_path):
+def test_nakanuki_image_regression_rgb_conversion_save_roundtrip_(tmp_path):
     """ RGB変換して保存した画像をRGB形式で開くことができる"""
     img = Image.open("test_assets/BA-90.png")
     result = nakanuki_image(img, 320, 520)
@@ -84,7 +82,7 @@ def test_nakanuki_image_rgb_conversion_save_roundtrip_(tmp_path):
 
     assert reloaded.mode == "RGB"
 
-def test_nakanuki_image_metadata_agnostic_processing(tmp_path):
+def test_nakanuki_image_regression_metadata_agnostic_processing(tmp_path):
     """ 中抜き後の画像をRGB変換しても壊れない"""
     img = Image.open("test_assets/BA-90.png")
     result = nakanuki_image(img, 320, 520)
