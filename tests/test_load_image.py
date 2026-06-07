@@ -6,7 +6,7 @@ from src.nakanuki_gui.main import NakanukiApp
 #   ✅- 画像読み込みとともにUIの各パラメータが適切にセットされる
 #       ✅- 元画像が読み込まれる
 #       ✅- 画像高さ表示ラベルが更新される
-#       - 「From」、「To」スピンボックスの最大値が更新される
+#       ✅- 「From」、「To」スピンボックスの最大値が更新される
 #       ✅- 画像をキャンバスに表示する内部メソッド_show_image_on_canvas()が呼ばれる
 #       ✅- 中抜き位置を表示する水平線を更新するupdate_lines()が呼ばれる
 #   ✅- 空のファイル名が渡されたときにキャンセルされる
@@ -52,6 +52,9 @@ def test_load_image_updates_ui(
     # 画像高さ表示ラベルに表示する文字列がセットされているはず
     #   - DummyImageインスタンスの画像高さは200px
     assert app.var_height.get() == "Height: 200 px"
+    # スピンボックスの最大値が画像高さと一致するはず
+    assert int(app.spin_from["to"]) == 200
+    assert int(app.spin_to["to"]) == 200
     # calledフラグはともにTrueのはず
     assert called["show"] is True
     assert called["update"] is True
