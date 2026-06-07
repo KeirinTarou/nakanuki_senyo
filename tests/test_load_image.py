@@ -4,12 +4,12 @@ from src.nakanuki_gui.main import NakanukiApp
 
 # TODO: 
 #   ✅- 画像読み込みとともにUIの各パラメータが適切にセットされる
-#   - 元画像が読み込まれる
-#   - 画像高さ表示ラベルが更新される
-#   - 「From」、「To」スピンボックスの最大値が更新される
-#   - 画像をキャンバスに表示する内部メソッド_show_image_on_canvas()が呼ばれる
-#   - 中抜き位置を表示する水平線を更新するupdate_lines()が呼ばれる
-#   - 空のファイル名が渡されたときにキャンセルされる
+#       ✅- 元画像が読み込まれる
+#       ✅- 画像高さ表示ラベルが更新される
+#       - 「From」、「To」スピンボックスの最大値が更新される
+#       ✅- 画像をキャンバスに表示する内部メソッド_show_image_on_canvas()が呼ばれる
+#       ✅- 中抜き位置を表示する水平線を更新するupdate_lines()が呼ばれる
+#   ✅- 空のファイル名が渡されたときにキャンセルされる
 
 def test_load_image_updates_ui(
         tk_root, monkeypatch, 
@@ -55,3 +55,24 @@ def test_load_image_updates_ui(
     # calledフラグはともにTrueのはず
     assert called["show"] is True
     assert called["update"] is True
+
+def test_load_image_cancelled(tk_root, monkeypatch):
+    """ 空のファイル名が渡されたときにキャンセルされる"""
+    # テスト用のtkinter.Tkインスタンスを用いてNakanukiAppインスタンス取得
+    app = NakanukiApp(tk_root)
+    # ファイルダイアログがキャンセルされた状態を再現
+    #   - filedialog.askopenfilename()が""を返すよう差し替え
+    monkeypatch.setattr(
+        "src.nakanuki_gui.main.filedialog.askopenfilename", 
+        lambda **_: ""
+    )
+    # load_image()メソッド実行
+    #   - 入り口のところで`not path`がTrueになるのでreturnされるはず
+    app.load_image()
+
+    # 検証
+    # app.original_imageはNoneのはず
+    #   - original_image属性をセットするところまで進まないはず
+    assert app.original_image is None
+    #  app.src_pathもNoneのはず
+    assert app.src_path is None

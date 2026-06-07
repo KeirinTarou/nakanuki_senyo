@@ -24,6 +24,7 @@ class NakanukiApp:
 
         # 画像データ
         self.original_image = None
+        self.src_path = None
         self.display_image = None
         self.display_scale = 1.0
         self.canvas_image_id = None
